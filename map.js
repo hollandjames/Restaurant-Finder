@@ -8,10 +8,12 @@
 
 function initAutocomplete() {
   var map = new google.maps.Map(document.getElementById('map'), {
-    center: {lat: -25.363, lng: 131.044},
+    center: {lat: -33.8688, lng: 151.2195},
     zoom: 13,
     mapTypeId: 'roadmap'
   });
+
+  var markers=[];
 
   var marker = new google.maps.Marker({
 
@@ -29,12 +31,7 @@ function initAutocomplete() {
 
   $("#saveToDatabase").click(function(){
    var bounds = new google.maps.LatLngBounds();
-
    var place = searchBox.getPlaces();
-
-
-   console.log(place[0].geometry.location);
-
    var locationJson = JSON.stringify(place[0]);
 
    $.ajax({
