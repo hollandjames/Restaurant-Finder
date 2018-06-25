@@ -1,5 +1,12 @@
 <?php
+
+/*
+header('Pragma: no-cache');
+header('cache-Control: no-cache, must-revalidate'); // HTTP/1.1
+header('Expires: Mon, 26 Jul 1997 05:00:00 GMT'); // Date in the past
+*/
 require_once('getMarkers.php');
+
 
 $markerArray = getMarkers();
 //echo sizeof($markerArray);
@@ -11,9 +18,25 @@ for($x=0; $x<sizeof($markerArray); $x++)
 {
     array_push($allMarkers,$markerArray[$x]['json']);
 }
+$justEvent = array();
+
+for($x=0; $x<sizeof($markerArray); $x++)
+{
+    array_push($justEvent,$markerArray[$x]['Event']);
+}
+$justTime = array();
+for($x=0; $x<sizeof($markerArray); $x++)
+{
+    array_push($justTime,$markerArray[$x]['Time']);
+}
+
+
 
 $allMarkersJson = json_encode($allMarkers, JSON_UNESCAPED_SLASHES);
+$eventMarkersJson = json_encode($justEvent, JSON_UNESCAPED_SLASHES);
+$TimeMarkersJson = json_encode($justTime, JSON_UNESCAPED_SLASHES);
 
+//var_dump($markerArray);
 //$newVar = stripcslashes($allMarkersJson[0]);
 ?>
 
@@ -24,6 +47,9 @@ $allMarkersJson = json_encode($allMarkers, JSON_UNESCAPED_SLASHES);
 
  <link rel="stylesheet" type="text/css" href="style.css">
  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+ <script src="rome.js"></script>
+
+
 
 </head>
 
@@ -31,16 +57,27 @@ $allMarkersJson = json_encode($allMarkers, JSON_UNESCAPED_SLASHES);
 
     <input id="eventName" class="controls" type="text" placeholder="Enter Event Name">
     <input id="pac-input" class="controls" type="text" placeholder="Enter Event Location">
-    <input id="datetime" type="datetime-local">
+    <input id='input' class='input'>
 
 
 
-<button id ="saveToDatabase" onclick="initAutoComplete()"> Save to events </button>
+<button id ="saveToDatabase"> Save to events </button>
+<button onclick ="showDateTime()"> show date time</button>
+
 
 <div id = "map">
 
 
 </div>
+
+<div id ="tableData">
+</div>
+
+
+
+<button onclick ="findPaths()">find the path</button>
+
+<div id="directionsPanel" style="width:24%;height: 100%;"></div>
 
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBLA4DFC6I-78xDP1MR4HZptnhttW02otU&libraries=places&callback=initAutocomplete"
 async defer></script>
@@ -54,22 +91,34 @@ async defer></script>
 <script>
 
 
+rome(input);
 
-var allMarkers = <?php echo $allMarkersJson ?>;
+
+var markerJson = <?php echo $allMarkersJson ?>;
+var eventName = <?php echo $eventMarkersJson ?>;
+var eventTime = <?php echo $TimeMarkersJson ?>;
+
 //var firstJson = allMarkers[0];
-
-		var markerMap = allMarkers.map(function(e) {
+//markers stored in json need to be converted to correct format
+		var markerMap = markerJson.map(function(e) {
 			return JSON.parse(e);
 		});
 
+var eventPlace = [];
 
+for (let x=0;x<markerMap.length;++x){
+  let currMarker = markerMap[x];
+  eventPlace.push(currMarker.name);
+}
 
+var allInfo =[eventPlace,eventName,eventTime];
 
 function initAutocomplete() {
   var map = new google.maps.Map(document.getElementById('map'), {
     center: {lat:51.507351 , lng: -0.127758},
     zoom: 13,
-    mapTypeId: 'roadmap'
+    mapTypeId: 'roadmap',
+    gestureHandling: 'greedy'
   });
 
 for(x=0;x<markerMap.length;x++){
@@ -83,6 +132,9 @@ for(x=0;x<markerMap.length;x++){
 
 marker.setMap(map);
 }
+
+
+
 var input = document.getElementById('pac-input');
 var searchBox = new google.maps.places.SearchBox(input);
 
@@ -93,38 +145,141 @@ $("#saveToDatabase").click(function(){
 var bounds = new google.maps.LatLngBounds();
 var place = searchBox.getPlaces();
 //gets event
-var event = document.getElementById('eventName');
+//var event = document.getElementById('eventName');
 //gets date time
-var datetime =document.getElementById('datetime');
+//var datetime =document.getElementById('datetime');, event:event,datetime:datetime
 
 
 //gets the first selected place in array
 var locationJson = JSON.stringify(place[0]);
+var event = firstLetterCaps((document.getElementById('eventName').value));
+var datetime =(document.getElementById('input').value).toString();
 
 $.ajax({
  type: "POST",
  url: "insertLocation.php",
  dataType:"json",
  data:  {
-   locationJson : locationJson, event:event,datetime:datetime
+   locationJson : locationJson, event:event,datetime
 },
-
- cache: false,
+cache: false,
  success: function(result){
    //if successful pop up notification using notify js
 
-  window.alert("successful upload!");
+ console.log("success");
 
- }});
+ },
+ error: function(XMLHttpRequest, textStatus, errorThrown) {
+                    alert("Status: " + textStatus); alert("Error: " + errorThrown);
+                }
+
+
+ });
+
+
 });
 
+}
+
+
+     var myTableDiv = document.getElementById("tableData");
+
+var table = document.createElement('TABLE');
+table.border='1';
+
+var tableBody = document.createElement('TBODY');
+table.appendChild(tableBody);
+
+for (var i=0; i<allInfo[0].length; i++){
+   var tr = document.createElement('TR');
+   tableBody.appendChild(tr);
+
+   for (var j=0; j<3; j++){
+       var td = document.createElement('TD');
+       td.width='150';
+       td.appendChild(document.createTextNode(allInfo[j][i]));
+       tr.appendChild(td);
+   }
+}
+myTableDiv.appendChild(table);
+function showDateTime(){
+
+var datetime =(document.getElementById('input').value).toString();
+window.alert(allInfo[0].length);
+//window.alert(datetime);
+
+}
+function firstLetterCaps(s){
+ var capitalised=  s.charAt(0).toUpperCase() + s.slice(1);
+ return capitalised;
+}
+/*
+  var destinationA =new google.maps.LatLng(markerMap[1].geometry.location);
+var destinationB =new google.maps.LatLng(markerMap[2].geometry.location);
+var destinationC =new google.maps.LatLng(markerMap[3].geometry.location);
+*/
+
+function findPaths(){
+
+  var request = {
+  origin: new google.maps.LatLng(markerMap[0].geometry.location),
+  destination: new google.maps.LatLng(markerMap[1].geometry.location),
+  travelMode:"WALKING"
+};
+
+var directionsDisplay = new google.maps.DirectionsRenderer({
+  polylineOptions:{
+    strokeColor: 'blue'},
+    //suppressMarkers: true // removes the default markers
+})
+
+var directionsService = new google.maps.DirectionsService();
+var service = new google.maps.DistanceMatrixService();
+
+  service.getDistanceMatrix(
+    {
+      origins: [request.origin],
+      destinations: [request.destination],
+      travelMode: request.travelMode
+   }, callback);
+
+function callback(response, status) {
+
+
+   var results = response.rows[0].elements;
+   var element = results[0];
+   var duration = element.duration.text;
 
 }
 
-function refreshPage(){
 
-  location.reload();
+  directionsService.route(request, function(response, status) {
+    if (status == "OK") {
+
+      directionsDisplay.setDirections(response);
+      directionsDisplay.setMap(map);
+      directionsDisplay.setPanel(document.getElementById('directionsPanel'));
+
+
+    } else {
+      window.alert("Directions request failed due to " + status);
+    }
+
+  });
+
+  var map = new google.maps.Map(document.getElementById('map'), {
+    center: {lat:51.507351 , lng: -0.127758},
+    zoom: 13,
+    mapTypeId: 'roadmap',
+    gestureHandling: 'greedy'
+  });
+
+
 }
+
+
+
+
 
     </script>
 

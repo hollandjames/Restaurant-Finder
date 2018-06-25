@@ -3,16 +3,21 @@ require_once("connection.php");
 
 
 
+
 if(isset($_POST["locationJson"])){
 
     $locationJson = $_POST['locationJson'];
-    $eventName = $_POST['eventName'];
+    $event = $_POST['event'];
     $datetime = $_POST['datetime'];
 
-    $query ="INSERT INTO Locations (json,Event,Time) VALUES (:param,:param,:param)";
+    $query ="INSERT INTO Locations (json,Event,Time) VALUES (:param, :event,:datetime)";
     $statement = $pdo ->prepare($query);
-    $statement->bindParam(':param', $locationJson,$eventName,$datetime);
+    $statement->bindParam(':param', $locationJson);
+    $statement->bindParam(':event', $event);
+    $statement->bindParam(':datetime', $datetime);
     $statement->execute();
+
+
 
 }
 
