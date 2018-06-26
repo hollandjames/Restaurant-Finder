@@ -120,20 +120,7 @@ function initAutocomplete() {
     mapTypeId: 'roadmap',
     gestureHandling: 'greedy'
   });
-
-for(x=0;x<markerMap.length;x++){
-  var thisMarker = markerMap[x];
-
-  var marker = new google.maps.Marker({
-
-    position: thisMarker.geometry.location,
-    title:"Hello World!"
-  });
-
-marker.setMap(map);
-}
-
-
+displayMyJourney();
 
 var input = document.getElementById('pac-input');
 var searchBox = new google.maps.places.SearchBox(input);
@@ -144,12 +131,6 @@ $("#saveToDatabase").click(function(){
 
 var bounds = new google.maps.LatLngBounds();
 var place = searchBox.getPlaces();
-//gets event
-//var event = document.getElementById('eventName');
-//gets date time
-//var datetime =document.getElementById('datetime');, event:event,datetime:datetime
-
-
 //gets the first selected place in array
 var locationJson = JSON.stringify(place[0]);
 var event = firstLetterCaps((document.getElementById('eventName').value));
@@ -179,17 +160,16 @@ cache: false,
 
 });
 
+
+
 }
 
 
-     var myTableDiv = document.getElementById("tableData");
-
+var myTableDiv = document.getElementById("tableData");
 var table = document.createElement('TABLE');
 table.border='1';
-
 var tableBody = document.createElement('TBODY');
 table.appendChild(tableBody);
-
 for (var i=0; i<allInfo[0].length; i++){
    var tr = document.createElement('TR');
    tableBody.appendChild(tr);
@@ -202,6 +182,7 @@ for (var i=0; i<allInfo[0].length; i++){
    }
 }
 myTableDiv.appendChild(table);
+
 function showDateTime(){
 
 var datetime =(document.getElementById('input').value).toString();
@@ -213,17 +194,20 @@ function firstLetterCaps(s){
  var capitalised=  s.charAt(0).toUpperCase() + s.slice(1);
  return capitalised;
 }
-/*
-  var destinationA =new google.maps.LatLng(markerMap[1].geometry.location);
-var destinationB =new google.maps.LatLng(markerMap[2].geometry.location);
-var destinationC =new google.maps.LatLng(markerMap[3].geometry.location);
-*/
 
-function findPaths(){
 
+function displayMyJourney(){
+var waypts =[]
+for (let y=1;y<markerMap.length-1;y++){
+waypts[y-1]=new Object();
+waypts[y-1].location=new google.maps.LatLng(markerMap[y].geometry.location);
+waypts[y-1].stopover =true;
+}
   var request = {
   origin: new google.maps.LatLng(markerMap[0].geometry.location),
-  destination: new google.maps.LatLng(markerMap[1].geometry.location),
+  destination: new google.maps.LatLng(markerMap[(markerMap.length-1)].geometry.location),
+  waypoints:waypts,
+  optimizeWaypoints: true,
   travelMode:"WALKING"
 };
 
