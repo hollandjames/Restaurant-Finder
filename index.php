@@ -79,7 +79,7 @@ $TimeMarkersJson = json_encode($justTime, JSON_UNESCAPED_SLASHES);
 
 <div id="directionsPanel" style="width:24%;height: 100%;"></div>
 
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBLA4DFC6I-78xDP1MR4HZptnhttW02otU&libraries=places&callback=initAutocomplete"
+<script src="https://maps.googleapis.com/maps/api/js?key=?&libraries=places&callback=initAutocomplete"
 async defer></script>
 
 
