@@ -6,33 +6,7 @@ header('cache-Control: no-cache, must-revalidate'); // HTTP/1.1
 header('Expires: Mon, 26 Jul 1997 05:00:00 GMT'); // Date in the past
 */
 require_once('getMarkers.php');
-$markerArray = getMarkers();
-//echo sizeof($markerArray);
-$firstLocation = $markerArray[0]['json'];
 
-$allMarkers = array();
-
-for($x=0; $x<sizeof($markerArray); $x++)
-{
-    array_push($allMarkers,$markerArray[$x]['json']);
-}
-$justEvent = array();
-
-for($x=0; $x<sizeof($markerArray); $x++)
-{
-    array_push($justEvent,$markerArray[$x]['Event']);
-}
-$justTime = array();
-for($x=0; $x<sizeof($markerArray); $x++)
-{
-    array_push($justTime,$markerArray[$x]['Time']);
-}
-
-
-
-$allMarkersJson = json_encode($allMarkers, JSON_UNESCAPED_SLASHES);
-$eventMarkersJson = json_encode($justEvent, JSON_UNESCAPED_SLASHES);
-$TimeMarkersJson = json_encode($justTime, JSON_UNESCAPED_SLASHES);
 
 //var_dump($markerArray);
 //$newVar = stripcslashes($allMarkersJson[0]);
@@ -40,7 +14,7 @@ $TimeMarkersJson = json_encode($justTime, JSON_UNESCAPED_SLASHES);
 
 
 <html>
-<title>Life Planner</title>
+<title>Restaurant Finder</title>
 <head>
 
  <link rel="stylesheet" type="text/css" href="style.css">
@@ -80,7 +54,7 @@ Where you at:
 <select id="currentLocationDropdown"></select>
 Wheres do you wanna be:
 <select id="destinationLocationDropdown"></select>
-
+<br>
 <button id ="findPath">Get the route</button>
 
 
@@ -102,7 +76,6 @@ async defer></script>
 
 var map;
 rome(input);
-
 
 var markerJson = <?php echo $allMarkersJson ?>;
 var eventName = <?php echo $eventMarkersJson ?>;
@@ -150,7 +123,6 @@ var datetime =(document.getElementById('input').value).toString();
 $.ajax({
  type: "POST",
  url: "insertLocation.php",
- dataType:"json",
  data:  {
    locationJson : locationJson, event:event,datetime
 },

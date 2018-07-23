@@ -1,0 +1,15 @@
+[14-Jun-2018 11:11:48 UTC] PHP Parse error:  syntax error, unexpected 'var' (T_VAR) in /home/juyldydc75el/public_html/LifePlanner/insertLocation.php on line 19
+[21-Jun-2018 14:45:03 UTC] PHP Warning:  PDOStatement::bindParam() expects parameter 3 to be integer, string given in /home/juyldydc75el/public_html/LifePlanner/insertLocation.php on line 16
+[21-Jun-2018 14:45:03 UTC] PHP Warning:  PDOStatement::execute(): SQLSTATE[HY093]: Invalid parameter number: no parameters were bound in /home/juyldydc75el/public_html/LifePlanner/insertLocation.php on line 17
+[21-Jun-2018 15:13:53 UTC] PHP Warning:  PDOStatement::bindParam() expects parameter 3 to be integer, string given in /home/juyldydc75el/public_html/LifePlanner/insertLocation.php on line 16
+[21-Jun-2018 15:13:53 UTC] PHP Warning:  PDOStatement::execute(): SQLSTATE[HY093]: Invalid parameter number: no parameters were bound in /home/juyldydc75el/public_html/LifePlanner/insertLocation.php on line 17
+[21-Jun-2018 15:14:44 UTC] PHP Warning:  PDOStatement::bindParam() expects parameter 3 to be integer, string given in /home/juyldydc75el/public_html/LifePlanner/insertLocation.php on line 16
+[21-Jun-2018 15:14:44 UTC] PHP Warning:  PDOStatement::execute(): SQLSTATE[HY093]: Invalid parameter number: no parameters were bound in /home/juyldydc75el/public_html/LifePlanner/insertLocation.php on line 17
+[21-Jun-2018 15:29:01 UTC] PHP Warning:  PDOStatement::bindParam() expects parameter 3 to be integer, string given in /home/juyldydc75el/public_html/LifePlanner/insertLocation.php on line 16
+[21-Jun-2018 15:29:01 UTC] PHP Warning:  PDOStatement::execute(): SQLSTATE[HY093]: Invalid parameter number: no parameters were bound in /home/juyldydc75el/public_html/LifePlanner/insertLocation.php on line 17
+[21-Jun-2018 15:44:39 UTC] PHP Warning:  PDOStatement::execute(): SQLSTATE[HY093]: Invalid parameter number: parameter was not defined in /home/juyldydc75el/public_html/LifePlanner/insertLocation.php on line 18
+[21-Jun-2018 16:05:39 UTC] PHP Notice:  Undefined offset: 0 in /home/juyldydc75el/public_html/LifePlanner/index.php on line 13
+[22-Jun-2018 10:25:30 UTC] PHP Notice:  Undefined offset: 0 in /home/juyldydc75el/public_html/LifePlanner/index.php on line 13
+[22-Jun-2018 10:38:53 UTC] PHP Notice:  Array to string conversion in /home/juyldydc75el/public_html/LifePlanner/index.php on line 32
+[22-Jun-2018 10:38:53 UTC] PHP Notice:  Array to string conversion in /home/juyldydc75el/public_html/LifePlanner/index.php on line 32
+[22-Jun-2018 10:38:53 UTC] PHP Notice:  Array to string conversion in /home/juyldydc75el/public_html/LifePlanner/index.php on line 32

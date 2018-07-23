@@ -1,40 +1,288 @@
+
+
 <html>
-<title>Life Planner</title>
+<title>Restaurant Finder</title>
 <head>
 
  <link rel="stylesheet" type="text/css" href="style.css">
  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
- <script src="objects.js"> </script>
+ <script src="rome.js"></script>
+ <link href="https://fonts.googleapis.com/css?family=Open+Sans|Roboto" rel="stylesheet">
+
+ <link rel="icon" href="Images/burger.jpg">
 
 </head>
 
 <body>
+<div id ="navbar">
+
+    <div id ="finder-title">RESTAURANT FINDER</div>
+</div>
+
+<div id ="rest-content">
+
+    <input id="pac-input" class="controls" type="text" placeholder="Where are you?">
 
 
-<div id = "tableData">
 
 
+<button id ="findRestaurants"> Find Restaurants </button>
+
+
+
+<div id ="myDropdown">
+
+
+
+</div>
+<div id="myButtons">
+</div>
+
+<div id="directionsPanel" style="width:24%;height: 100%;"></div>
 
 
 
 </div>
 
 
-
-
-
-
-
+<div id = "map"></div>
 </body>
-<script>
-//array
-var x=0;
-var x = ('kitten','sitting');
-console.log(x);
 
-
-
-
-
-       </script>
 </html>
+
+
+<script>
+
+var map;
+var allPlaces=[];
+
+
+
+
+function initAutocomplete() {
+    map = new google.maps.Map(document.getElementById('map'), {
+    center: {lat:51.507351 , lng: -0.127758},
+    zoom: 15,
+    mapTypeId: 'roadmap',
+    gestureHandling: 'greedy'
+  });
+
+
+var input = document.getElementById('pac-input');
+var searchBox = new google.maps.places.SearchBox(input);
+var myDropdown = document.getElementById("myDropdown");
+var buttonCollection = document.getElementById("myButtons");
+var locationJson;
+var place;
+$("#findRestaurants").click(function(){
+//clears previous drop down menu 
+    //selectDest.innerHTML="";
+//gets place
+
+var place="";
+allPlaces=[];
+$("#directionsPanel").empty();
+
+var bounds = new google.maps.LatLngBounds();
+var place = searchBox.getPlaces();
+
+//gets the first selected place in array
+ locationJson = JSON.stringify(place[0]);
+ locationJson=JSON.parse(locationJson);
+
+ //console.log(locationJson);
+ var marker = new google.maps.Marker({
+    map: map,
+    position: locationJson.geometry.location,
+    icon:'Images/male.svg'
+  });
+
+map.panTo(locationJson.geometry.location);
+
+
+var request = {
+    location: locationJson.geometry.location,
+    radius: '2000',
+    type: ['restaurant']
+  };
+//var allPlaces=[];
+service = new google.maps.places.PlacesService(map);
+service.nearbySearch(request, callback);
+function callback(results, status) {
+    if(document.getElementById("destinationLocationDropdown")!==null){
+document.getElementById("myDropdown").innerHTML="";
+    }
+    if(document.getElementById("showPath")!==null){
+document.getElementById("myButtons").innerHTML="";
+    }
+  if (status == google.maps.places.PlacesServiceStatus.OK) {
+    var someTxt = document.createElement("P1");
+    someTxt.id="someTxt";
+    someTxt.innerHTML='Choose a restaurant: ';
+myDropdown.appendChild(someTxt);
+    var drop = document.createElement("SELECT");
+drop.id="destinationLocationDropdown";
+myDropdown.appendChild(drop);
+var showPathButton = document.createElement("BUTTON");
+showPathButton.id="showPath";
+showPathButton.innerHTML="Show Path";
+buttonCollection.appendChild(showPathButton);
+var allPathButton = document.createElement("BUTTON");
+allPathButton.id="showAll";
+allPathButton.innerHTML="Show All Places";
+buttonCollection.appendChild(allPathButton);
+//call this again so the doc can see the newly gen buttons
+showMyPath();
+showMyAll();
+
+    for (var i = 0; i < results.length; i++) {
+//converts place to appropriate format to read lat/lng     
+var place = JSON.parse(JSON.stringify(results[i]));
+
+
+allPlaces.push(place);
+
+    //  console.log(results.length);
+     // createMarker(results[i]);
+
+var selectDest = document.getElementById("destinationLocationDropdown");
+
+     var opt = document.createElement("option");
+  opt.text = place.name;
+ // opt.value = puzzleArray[g];
+  selectDest.appendChild(opt);
+createMarker(place);
+
+    }
+
+  }
+}
+
+function showMyAll(){
+
+$( "#showAll" ).click(function() {
+if(allPlaces.length>0){
+    for(let i=0;i<allPlaces.length;i++){
+        createMarker(allPlaces[i]);
+    }
+ map.panTo(locationJson.geometry.location);
+}});
+}
+function createMarker(place) {
+ // var placeLoc = place.geometry.location;
+  var marker = new google.maps.Marker({
+    map: map,
+    animation:google.maps.Animation.DROP,
+    position: place.geometry.location
+  });
+  var infowindow = new google.maps.InfoWindow();
+  google.maps.event.addListener(marker, 'onmouseover', function() {
+    
+    infowindow.setContent(place.name);
+    
+    infowindow.open(map, this);
+  });
+}
+
+function showMyPath(){
+
+$("#showPath").click(function(){
+    $("#directionsPanel").empty();
+
+ let fromJourney = locationJson.geometry.location;
+let toJourney = document.getElementById('destinationLocationDropdown').value;
+
+   for (let i = 0; i<allPlaces.length;i++){
+    
+     if (allPlaces[i].name ==toJourney){
+
+    toJourney = new google.maps.LatLng(allPlaces[i].geometry.location);
+}
+}
+  var searchRequest = {
+  origin: fromJourney,
+  destination: toJourney,
+  travelMode:"WALKING"
+};
+var searchService = new google.maps.DistanceMatrixService();
+var searchDirectionsService = new google.maps.DirectionsService();
+
+var searchDirectionsDisplay = new google.maps.DirectionsRenderer({
+  polylineOptions:{
+    strokeColor: 'red'},
+    suppressMarkers: true
+    //suppressMarkers: true // removes the default markers
+});
+
+
+
+searchService.getDistanceMatrix(
+    {
+      origins: [fromJourney],
+      destinations: [toJourney],
+      travelMode: "WALKING"
+   }, displayTitle);
+
+   function displayTitle(response, status) {
+
+//edit html element to display  names of route
+}
+
+  searchDirectionsService.route(searchRequest, function(response, status) {
+    if (status == "OK") {
+        $("#directionsPanel").empty();
+
+    map = new google.maps.Map(document.getElementById('map'), {
+    center: fromJourney,
+    zoom: 15,
+    mapTypeId: 'roadmap',
+    gestureHandling: 'greedy'
+  });
+
+    var amarker = new google.maps.Marker({
+    map: map,
+    icon:"Images/male.svg",
+    position: fromJourney
+  });
+  var bmarker = new google.maps.Marker({
+    map: map,
+    animation:google.maps.Animation.DROP,
+    position: toJourney
+  });
+
+      searchDirectionsDisplay.setDirections(response);
+      
+      searchDirectionsDisplay.setMap(map);
+      //clear the current route
+
+    
+
+      searchDirectionsDisplay.setPanel(document.getElementById('directionsPanel'));
+    } else {
+      window.alert("Directions request failed due to " + status);
+    }
+
+  });
+
+
+
+
+
+});
+
+}
+
+
+});
+
+
+
+}
+
+
+
+
+</script>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBLA4DFC6I-78xDP1MR4HZptnhttW02otU&libraries=places&callback=initAutocomplete"
+async defer></script>
