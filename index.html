@@ -8,7 +8,7 @@
  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
  <script src="rome.js"></script>
  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Roboto" rel="stylesheet">
-
+<script src="showRoute.js"></script>
  <link rel="icon" href="Images/burger.jpg">
 
 </head>
@@ -23,7 +23,19 @@
 
     <input id="pac-input" class="controls" type="text" placeholder="Where are you?">
 
-
+    <select id="chooseType">
+      <option value="">All</option>
+      <option value="indian">Indian</option>
+      <option value="chinese">Chinese</option>
+      <option value="pub">Pub</option>
+      <option value="burger">Burgers</option>
+      <option value="italian">Italian</option>
+      <option value="pizza">Pizza</option>
+      <option value="buffet">Buffet</option>
+      <option value="chicken">Chicken</option>
+      <option value="japanese">Japanese</option>
+      <option value="fish and chips">Fish &amp; Chips</option>
+    </select>
 
 
 <button id ="findRestaurants"> Find Restaurants </button>
@@ -37,13 +49,25 @@
 </div>
 <div id="myButtons">
 </div>
+<div id ="wrapper">
 
-<div id="directionsPanel" style="width:24%;height: 100%;"></div>
 
+
+<div id="directionsPanel" ></div>
+
+
+
+
+
+
+
+<div id ="rating">
 
 
 </div>
-
+</div>
+</div>
+</div>
 
 <div id = "map"></div>
 </body>
@@ -72,6 +96,7 @@ var input = document.getElementById('pac-input');
 var searchBox = new google.maps.places.SearchBox(input);
 var myDropdown = document.getElementById("myDropdown");
 var buttonCollection = document.getElementById("myButtons");
+var thisRating= document.getElementById("rating");
 var locationJson;
 var place;
 $("#findRestaurants").click(function(){
@@ -82,6 +107,7 @@ $("#findRestaurants").click(function(){
 var place="";
 allPlaces=[];
 $("#directionsPanel").empty();
+thisRating.innerHTML="";
 
 var bounds = new google.maps.LatLngBounds();
 var place = searchBox.getPlaces();
@@ -103,7 +129,10 @@ map.panTo(locationJson.geometry.location);
 var request = {
     location: locationJson.geometry.location,
     radius: '2000',
-    type: ['restaurant']
+    type: ['restaurant'],
+    keyword:document.getElementById('chooseType').value
+    
+
   };
 //var allPlaces=[];
 service = new google.maps.places.PlacesService(map);
@@ -118,7 +147,7 @@ document.getElementById("myButtons").innerHTML="";
   if (status == google.maps.places.PlacesServiceStatus.OK) {
     var someTxt = document.createElement("P1");
     someTxt.id="someTxt";
-    someTxt.innerHTML='Choose a restaurant: ';
+    someTxt.innerHTML='Take me to: ';
 myDropdown.appendChild(someTxt);
     var drop = document.createElement("SELECT");
 drop.id="destinationLocationDropdown";
@@ -176,12 +205,37 @@ function createMarker(place) {
     position: place.geometry.location
   });
   var infowindow = new google.maps.InfoWindow();
-  google.maps.event.addListener(marker, 'onmouseover', function() {
+  google.maps.event.addListener(marker, 'mouseover', function() {
     
     infowindow.setContent(place.name);
-    
+  //createMarker(locationJson,marker)
     infowindow.open(map, this);
   });
+  google.maps.event.addListener(marker, 'mouseout', function() {
+    
+    infowindow.close();
+  });
+  google.maps.event.addListener(marker, 'click', function() {
+    var name = place.name;
+    showRoute(locationJson,marker,name);
+    getRating(place);
+  });
+}
+
+function getRating(place){
+
+  //var score = place.rating;
+
+   thisRating.innerHTML="";
+
+var scoreTxt = document.createTextNode("Rating: "+place.rating + "/5.00");
+var restName = document.createTextNode(place.name);
+linebreak = document.createElement("br");
+thisRating.appendChild(restName);
+thisRating.appendChild(linebreak);
+thisRating.appendChild(scoreTxt);
+
+
 }
 
 function showMyPath(){
@@ -195,8 +249,13 @@ let toJourney = document.getElementById('destinationLocationDropdown').value;
    for (let i = 0; i<allPlaces.length;i++){
     
      if (allPlaces[i].name ==toJourney){
+       
 
     toJourney = new google.maps.LatLng(allPlaces[i].geometry.location);
+    toJourneyHover=(allPlaces[i]);
+
+  getRating(toJourneyHover);
+
 }
 }
   var searchRequest = {
@@ -244,11 +303,15 @@ searchService.getDistanceMatrix(
     icon:"Images/male.svg",
     position: fromJourney
   });
+
+  /*
   var bmarker = new google.maps.Marker({
     map: map,
     animation:google.maps.Animation.DROP,
     position: toJourney
   });
+*/
+createMarker(toJourneyHover);
 
       searchDirectionsDisplay.setDirections(response);
       
